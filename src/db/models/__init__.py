@@ -1,4 +1,3 @@
-__all__ = ("BaseModel", "Item")
+__all__ = ("BaseModel")
 
 from db.models.base import BaseModel
-from db.models.item import Item

@@ -21,7 +21,7 @@ async def get_window_auth(request: Request):
 
 
 @router.post("/login/")
-async def login_user(user_scheme: UserAuth = Depends(), password_service: PasswordService = Depends()):
+async def login_user(user_scheme: UserAuth, password_service: PasswordService = Depends()):
     user = await password_service.authenticate_user(login=user_scheme.login, password=user_scheme.password)
     if user is None:
         raise incorrect_login_of_password_exception
@@ -29,7 +29,7 @@ async def login_user(user_scheme: UserAuth = Depends(), password_service: Passwo
 
 
 @router.post("/register")
-async def register_user(user_scheme: UserRegister = Depends(), user_repo: UserRepository = Depends()):
+async def register_user(user_scheme: UserRegister, user_repo: UserRepository = Depends()):
     login = user_scheme.login
     password = user_scheme.password
 

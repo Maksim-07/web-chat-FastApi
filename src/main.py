@@ -1,10 +1,9 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-from api.api_user import router
+from api.router import router
 from core.config import settings
 
 app = FastAPI(
@@ -22,17 +21,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.get("/")
-async def redirect_to_auth():
-    return RedirectResponse(url="/auth")
-
-
-@app.get("/chat")
-async def redirect_to_auth():
-    return {"login": True}
-
 
 if __name__ == "__main__":
     uvicorn.run(app, host=settings().server_host, port=settings().server_port)

@@ -7,7 +7,7 @@ from db.session import get_session
 
 class BaseDatabaseRepository:
     _session: AsyncSession
-    model = None
+    model: None
 
     def __init__(self, session: AsyncSession = Depends(get_session)) -> None:
         self._session = session
@@ -17,7 +17,7 @@ class BaseDatabaseRepository:
         await self._session.execute(new_instance)
         await self._session.commit()
 
-    async def find(self, **filter_by):
+    async def get_by(self, **filter_by):
         new_instance = select(self.model).filter_by(**filter_by)
         result = await self._session.execute(new_instance)
         return result.scalar_one_or_none()

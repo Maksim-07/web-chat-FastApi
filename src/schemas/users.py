@@ -1,14 +1,14 @@
 from pydantic import BaseModel
 
 
-class UserBase(BaseModel):
+class UserBaseSchema(BaseModel):
     login: str
     password: str
 
 
-class UserRegister(UserBase):
+class UserRegisterSchema(UserBaseSchema):
     pass
 
 
-class UserAuth(UserBase):
+class UserAuthSchema(UserBaseSchema):
     pass

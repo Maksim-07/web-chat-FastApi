@@ -3,11 +3,11 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from core.exceptions import (
-    incorrect_login_of_password_exception,
+    incorrect_login_or_password_exception,
     user_already_exists_exception,
 )
 from db.repository.user import UserRepository
-from schemas.users import UserAuth, UserRegister
+from schemas.users import UserAuthSchema, UserRegisterSchema
 from services.password import PasswordService
 
 router = APIRouter(prefix="/auth", tags=["Authorization"])
@@ -21,15 +21,15 @@ async def get_window_auth(request: Request):
 
 
 @router.post("/login/")
-async def login_user(user_scheme: UserAuth, password_service: PasswordService = Depends()):
+async def login_user(user_scheme: UserAuthSchema, password_service: PasswordService = Depends()):
     user = await password_service.authenticate_user(login=user_scheme.login, password=user_scheme.password)
     if user is None:
-        raise incorrect_login_of_password_exception
+        raise incorrect_login_or_password_exception
     return {"ok": True, "message": "Авторизация успешна"}
 
 
 @router.post("/register")
-async def register_user(user_scheme: UserRegister, user_repo: UserRepository = Depends()):
+async def register_user(user_scheme: UserRegisterSchema, user_repo: UserRepository = Depends()):
     login = user_scheme.login
     password = user_scheme.password
 

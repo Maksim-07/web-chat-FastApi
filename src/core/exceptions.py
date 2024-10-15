@@ -1,14 +1,16 @@
 from fastapi import HTTPException, status
 
-item_not_found_exception = HTTPException(
+user_not_found_exception = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
-    detail="Item not found",
+    detail="User not found",
 )
 
 user_already_exists_exception = HTTPException(
-    status_code=status.HTTP_409_CONFLICT, detail="Пользователь уже существует"
+    status_code=status.HTTP_409_CONFLICT,
+    detail="The user already exists",
 )
 
-incorrect_login_of_password_exception = HTTPException(
-    status_code=status.HTTP_409_CONFLICT, detail="Неверный логин или пароль"
+incorrect_login_or_password_exception = HTTPException(
+    status_code=status.HTTP_401_UNAUTHORIZED,
+    detail="Invalid username or password",
 )

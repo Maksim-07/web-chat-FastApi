@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 
-from api.auth import auth_router
-from api.chat import chat_router
-from api.static import static_router
+from api.auth import router as auth_router
+from api.chat import router as chat_router
+from api.static import router as static_router
 
 router = APIRouter(prefix="")
 

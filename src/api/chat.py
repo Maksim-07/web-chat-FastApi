@@ -1,8 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, status
 
-chat_router = APIRouter(prefix="/chat", tags=["Chat"])
+router = APIRouter(prefix="/chat", tags=["Chat"])
 
 
-@chat_router.get("")
+@router.get("", status_code=status.HTTP_200_OK)
 async def login_to_chat():
     return {"login": True}

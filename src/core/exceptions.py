@@ -10,7 +10,7 @@ user_already_exists_exception = HTTPException(
     detail="The user already exists",
 )
 
-incorrect_login_or_password_exception = HTTPException(
+incorrect_password_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
-    detail="Invalid username or password",
+    detail="Invalid password",
 )

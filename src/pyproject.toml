@@ -16,6 +16,7 @@ sqlalchemy = {extras = ["mypy"], version = "^2.0.15"}
 asyncpg = "^0.27.0"
 inflection = "^0.5.1"
 loguru = "^0.7.0"
+passlib = "^1.7.4"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -23,6 +24,7 @@ pytest = "^7.3.1"
 isort = "^5.12.0"
 black = "^23.3.0"
 flake8 = "^6.0.0"
+mypy = "^1.12.0"
 
 
 [build-system]

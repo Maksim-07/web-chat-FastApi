@@ -1,14 +1,19 @@
 import uvicorn
 from fastapi import FastAPI
-from starlette.middleware.cors import CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
+from api.router import router
 from core.config import settings
 
 app = FastAPI(
-    title="Web Chat",
+    title="web-chat",
     openapi_url="/api/openapi.json",
     docs_url="/api/swagger",
 )
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+app.include_router(router)
 
 app.add_middleware(
     CORSMiddleware,

@@ -12,5 +12,5 @@ async def login_user(user_scheme: UserAuthSchema, auth_service: AuthService = De
 
 
 @router.post("/register", status_code=status.HTTP_200_OK)
-async def register_user(user_scheme: UserRegisterSchema, user_service: AuthService = Depends()):
-    return await user_service.register(user_scheme)
+async def register_user(user_scheme: UserRegisterSchema, auth_service: AuthService = Depends()):
+    return await auth_service.register(user_scheme)

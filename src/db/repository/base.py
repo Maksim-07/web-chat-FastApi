@@ -16,11 +16,11 @@ class BaseDatabaseRepository:
         self._session = session
 
     async def add(self, **kwargs) -> None:
-        new_instance = insert(self.model).values(**kwargs)
-        await self._session.execute(new_instance)
+        query = insert(self.model).values(**kwargs)
+        await self._session.execute(query)
         await self._session.commit()
 
     async def get_by(self, **filter_by) -> BaseModel | None:
-        new_instance = select(self.model).filter_by(**filter_by)
-        result = await self._session.execute(new_instance)
+        query = select(self.model).filter_by(**filter_by)
+        result = await self._session.execute(query)
         return result.scalar_one_or_none()

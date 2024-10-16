@@ -19,7 +19,7 @@ class AuthService:
     async def login(self, user: UserAuthSchema) -> None:
         current_user = await self.user_repo.get_by(login=user.login)
 
-        if current_user is None:
+        if not current_user:
             raise user_not_found_exception
 
         if self.__verify_password(password=user.password, hash_password=current_user.password):

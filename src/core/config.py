@@ -21,11 +21,11 @@ class Settings(BaseSettings):
 
     CORS_ALLOW_ORIGIN_LIST: str = "http://127.0.0.1:8000"
 
-    POSTGRES_HOST: str = "localhost"
-    POSTGRES_PORT: int = 5432
-    POSTGRES_USER: str = "template-app"
-    POSTGRES_PASSWORD: str = "template-app"
-    POSTGRES_DB: str = "template-app"
+    POSTGRES_HOST: str
+    POSTGRES_PORT: int
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_DB: str
 
     @functools.cached_property
     def cors_allow_origins(self) -> list[str]:
@@ -33,10 +33,10 @@ class Settings(BaseSettings):
 
     @functools.cached_property
     def postgres_host(self) -> str:
-        if platform.system() == "Linux":
-            return "template-db"
-        else:
-            return self.POSTGRES_HOST
+        # if platform.system() == "Linux":
+        #     return "template-db"
+        # else:
+        return self.POSTGRES_HOST
 
     @functools.cached_property
     def postgres_dsn(self) -> str:

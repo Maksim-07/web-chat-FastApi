@@ -14,8 +14,8 @@ class Settings(BaseSettings):
     root_dir: str = os.path.abspath(__file__ + 3 * "/..")
     src_dir: str = os.path.join(root_dir, "src")
 
-    # server_host: str = "0.0.0.0"
-    server_host: str = "localhost"
+    server_host: str = "0.0.0.0"
+    # server_host: str = "localhost"
     server_port: int = 8000
 
     ENVIRONMENT: str = "local"
@@ -33,18 +33,10 @@ class Settings(BaseSettings):
         return self.CORS_ALLOW_ORIGIN_LIST.split("&")
 
     @functools.cached_property
-    def postgres_host(self) -> str:
-        # if platform.system() == "Linux":
-        #     return "template-db"
-        # else:
-        return self.POSTGRES_HOST
-
-    @functools.cached_property
     def postgres_dsn(self) -> str:
-        database = self.POSTGRES_DB if self.ENVIRONMENT != "test" else f"{self.POSTGRES_DB}_test"
         return (
             f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@"
-            f"{self.postgres_host}:{self.POSTGRES_PORT}/{database}"
+            f"{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         )
 
     class Config:

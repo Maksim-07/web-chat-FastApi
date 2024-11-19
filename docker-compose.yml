@@ -1,13 +1,12 @@
 version: "3.9"
 
 services:
-  app:
+  web-chat-app:
     container_name: web-chat-app
     build: ./src
     working_dir: /usr/app/src
     command: sh -c "
-      alembic upgrade head &&
-      uvicorn main:app --host 0.0.0.0 --port 8000
+      alembic upgrade head && python main.py
       "
     environment:
       - ENVIRONMENT=container
@@ -16,14 +15,15 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - db
+      - web-chat-db
 
-  db:
+  web-chat-db:
     image: postgres:latest
-    container_name: postgres_container
+    container_name: web-chat-db
+    command: -p 5532
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=nCj4Fipk
-      - POSTGRES_DB=web-chat
+      - POSTGRES_USER=web-chat-db
+      - POSTGRES_PASSWORD=web-chat-db
+      - POSTGRES_DB=web-chat-db
     ports:
-      - "5432:5432"
+      - "5532:5532"

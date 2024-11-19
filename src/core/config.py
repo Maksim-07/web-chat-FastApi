@@ -1,6 +1,5 @@
 import functools
 import os
-import platform
 
 from pydantic_settings import BaseSettings
 
@@ -14,9 +13,8 @@ class Settings(BaseSettings):
     root_dir: str = os.path.abspath(__file__ + 3 * "/..")
     src_dir: str = os.path.join(root_dir, "src")
 
-    server_host: str = "0.0.0.0"
-    # server_host: str = "localhost"
-    server_port: int = 8000
+    SERVER_HOST: str = "0.0.0.0"
+    SERVER_PORT: int = 8000
 
     ENVIRONMENT: str = "local"
 

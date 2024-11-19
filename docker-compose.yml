@@ -10,12 +10,16 @@ services:
       "
     environment:
       - ENVIRONMENT=container
-    env_file:
-      - ./src/.env
     ports:
       - "8000:8000"
     depends_on:
-      - web-chat-db
+      web-chat-db:
+        condition: service_healthy
+    healthcheck:
+      test: curl -f http://localhost:8000/chat
+      interval: 60s
+      timeout: 3s
+      retries: 3
 
   web-chat-db:
     image: postgres:latest
@@ -25,5 +29,17 @@ services:
       - POSTGRES_USER=web-chat-db
       - POSTGRES_PASSWORD=web-chat-db
       - POSTGRES_DB=web-chat-db
+    expose:
+      - 5532
     ports:
       - "5532:5532"
+    volumes:
+      - pvr-db-data:/var/lib/postgresql/data/
+    healthcheck:
+      test: pg_isready -p 5532 -U web-chat-db -d web-chat-db
+      interval: 60s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  pvr-db-data:

@@ -8,4 +8,4 @@ COPY . /usr/app/src/
 RUN pip install poetry --no-cache-dir
 
 RUN poetry config virtualenvs.create false && \
-    poetry install --no-interaction --no-ansi --no-cache
+    poetry install --no-interaction --no-ansi --no-cache --without dev

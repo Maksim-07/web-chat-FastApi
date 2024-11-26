@@ -21,16 +21,15 @@ class MessageService:
 
     async def working_with_websocket(self, websocket: WebSocket, client_id: int):
         await connection_manager.connect(websocket)
-        # user_name = await self.user_repo.get_login_by_id(user_id=client_id)
+        user_name = await self.user_repo.get_login_by_id(user_id=client_id)
         try:
             while True:
                 data = await websocket.receive_text()
 
                 await connection_manager.send_personal_message(f"Вы: {data}", websocket)
 
-                await connection_manager.broadcast(f"Клиент #{client_id}: {data}", websocket)
-                # await connection_manager.broadcast(f"{user_name}: {data}", websocket)
+                await connection_manager.broadcast(f"{user_name}: {data}", websocket)
 
         except WebSocketDisconnect:
             connection_manager.disconnect(websocket)
-            await connection_manager.broadcast(f"Клиент #{client_id} вышел из чата", websocket)
+            await connection_manager.broadcast(f"{user_name} вышел из чата", websocket)

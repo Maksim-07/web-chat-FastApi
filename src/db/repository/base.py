@@ -25,3 +25,8 @@ class BaseDatabaseRepository(Generic[T]):
         query = select(self.model).filter_by(**filter_by)
         result = await self._session.execute(query)
         return result.scalar_one_or_none()
+
+    async def get_all(self):
+        query = select(self.model)
+        result = await self._session.execute(query)
+        return result.scalars().all()

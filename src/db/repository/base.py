@@ -1,4 +1,4 @@
-from typing import Generic, Type, TypeVar
+from typing import Generic, Type, TypeVar, Sequence
 
 from fastapi import Depends
 from sqlalchemy import insert, select
@@ -26,7 +26,7 @@ class BaseDatabaseRepository(Generic[T]):
         result = await self._session.execute(query)
         return result.scalar_one_or_none()
 
-    async def get_all(self):
+    async def get_all(self) -> Sequence[T]:
         query = select(self.model)
         result = await self._session.execute(query)
         return result.scalars().all()

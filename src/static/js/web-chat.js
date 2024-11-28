@@ -1,4 +1,4 @@
-const userName = sessionStorage.getItem('userName');
+const userName = localStorage.getItem('userName');
 
 async function fetchData(url) {
     try {
@@ -16,13 +16,6 @@ async function fetchData(url) {
 async function main(login) {
     const url = `http://127.0.0.1:8000/user/id/${login}`;
     const id = await fetchData(url);
-    getMessages()
-    .then(messages => {
-        displayMessages(messages);
-    })
-    .catch(error => {
-        console.error('Failed to get messages:', error);
-    });
     connectWebSocket(id["id"]);
 }
 
@@ -73,41 +66,6 @@ function connectWebSocket(id) {
         }
     });
 }
-
-async function getLoginById(user_id) {
-    try {
-        const response = await fetch(`http://127.0.0.1:8000/user/login/${user_id}`);
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const login = await response.json();
-        return login;
-    } catch (error) {
-        console.error('Ошибка:', error);
-    }
-}
-
-async function getMessages() {
-    try {
-        const response = await fetch('http://127.0.0.1:8000/chat/read-all-messages');
-        const messages = await response.json();
-        return messages;
-    } catch (error) {
-        console.error('Error fetching messages:', error);
-        throw error;
-    }
-}
-
-function displayMessages(messages) {
-    const chatBox = document.getElementById('messageContainer');
-    messages.forEach(message => {
-        const messageDiv = document.createElement('div');
-        messageDiv.textContent = `${message.sender_id}: ${message.message}`;
-        chatBox.appendChild(messageDiv);
-    });
-}
-
-
 
 main(userName).catch(error => {
     console.error('Ошибка в main:', error);

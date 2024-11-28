@@ -10,7 +10,7 @@ class UserRepository(BaseDatabaseRepository[User]):
     async def get_id_by_login(self, login: str) -> int:
         query = select(self.model.id).filter_by(login=login)
         result = await self._session.execute(query)
-        return result.scalar_one_or_none()
+        return result.scalar_one()
 
     async def get_login_by_id(self, user_id: int) -> str:
         query = select(self.model.login).filter_by(id=user_id)

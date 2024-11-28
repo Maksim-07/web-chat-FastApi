@@ -17,7 +17,7 @@ loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const username = loginForm.querySelector('input[type="text"]').value;
-    sessionStorage.setItem('userName', username);
+    localStorage.setItem('userName', username);
     const password = loginForm.querySelector('input[type="password"]').value;
 
     try {

@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from fastapi import Depends, WebSocket, WebSocketDisconnect
 
 from db.repository.message import MessageRepository
@@ -21,16 +23,16 @@ class MessageService:
     async def send_message(self, message: MessageSchema) -> None:
         await self.message_repo.add(sender_id=message.sender_id, message=message.message)
 
-    async def read_message(self, login):
+    async def read_message(self, login) -> Sequence[str]:
         user_id = await self.user_repo.get_id_by_login(login=login)
 
         return await self.message_repo.get_message_by_sender_id(user_id)
 
-    async def show_all_messages(self):
-        messages = await self.message_repo.get_all()
+    async def show_all_messages(self) -> list[dict[str, str]]:
+        all_messages = await self.message_repo.get_all()
 
         list_messages = []
-        for message in messages:
+        for message in all_messages:
             dict_message: dict[str, str] = {}
 
             user_id = message.sender_id
@@ -47,6 +49,10 @@ class MessageService:
         await connection_manager.connect(websocket)
 
         user_name = await self.user_repo.get_login_by_id(user_id=client_id)
+
+        all_messages = await self.show_all_messages()
+        for message in all_messages:
+            await connection_manager.send_personal_message(f"{message["sender_id"]}: {message["message"]}", websocket)
 
         await connection_manager.broadcast(f"{user_name} присоединился к чату", websocket)
 

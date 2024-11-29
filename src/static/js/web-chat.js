@@ -1,6 +1,6 @@
 const userName = localStorage.getItem('userName');
 
-async function fetchData(url) {
+async function getIdByLogin(url) {
     try {
         const response = await fetch(url);
         if (!response.ok) {
@@ -15,7 +15,7 @@ async function fetchData(url) {
 
 async function main(login) {
     const url = `http://127.0.0.1:8000/user/id/${login}`;
-    const id = await fetchData(url);
+    const id = await getIdByLogin(url);
     connectWebSocket(id["id"]);
 }
 
@@ -25,29 +25,56 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+function showMessage(sender, content, isSent) {
+    const container = document.getElementById('messageContainer');
+    const wrapper = document.createElement('div');
+    wrapper.className = 'message-wrapper';
 
-function showMessage(message) {
-    const messageContainer = document.getElementById('messageContainer');
-    const messageElement = document.createElement('div');
-    messageElement.textContent = message;
-    messageContainer.appendChild(messageElement);
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+    messageDiv.textContent = content;
+
+    const senderDiv = document.createElement('div');
+    senderDiv.className = 'message-sender';
+    senderDiv.textContent = sender;
+
+    wrapper.appendChild(messageDiv);
+    wrapper.appendChild(senderDiv);
+    container.appendChild(wrapper);
+
+    container.scrollTop = container.scrollHeight;
 }
 
 function connectWebSocket(id) {
     const socket = new WebSocket('ws://127.0.0.1:8000/ws/' + id);
     console.log('ws://127.0.0.1:8000/ws/' + id)
 
-    socket.addEventListener('open', (event) => {
-        showMessage('Подключен к серверу.');
-    });
+    socket.onopen = function() {
+        alert("Соединение установлено");
+    };
 
-    socket.onmessage = (event) => {
-        showMessage(event.data)
-    }
+    socket.onerror = function(error) {
+        alert("Ошибка " + error.message);
+    };
 
-    socket.addEventListener('close', (event) => {
-        showMessage('Соединение закрыто.');
-    });
+    socket.onmessage = function(event) {
+        try {
+            const data = JSON.parse(event.data);
+            const sender = data["sender"];
+            const content = data["content"];
+            if (sender != userName) {
+                showMessage(sender, content, false);
+            } else {
+                showMessage(sender, content, true);
+            }
+        } catch (e) {
+            console.error('Error parsing message:', e);
+        }
+    };
+
+    socket.onclose = function() {
+        alert("Соединение закрыто");
+    };
 
     const inputText = document.getElementById("messageInput");
     const submitButton = document.getElementById("submitButton");

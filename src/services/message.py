@@ -38,8 +38,8 @@ class MessageService:
             user_id = message.sender_id
             login = await self.user_service.get_login_by_id(user_id)
 
-            dict_message["sender_id"] = login
-            dict_message["message"] = message.message
+            dict_message["sender"] = login
+            dict_message["content"] = message.message
 
             list_messages.append(dict_message)
 
@@ -52,21 +52,25 @@ class MessageService:
 
         all_messages = await self.show_all_messages()
         for message in all_messages:
-            await connection_manager.send_personal_message(f"{message["sender_id"]}: {message["message"]}", websocket)
+            await connection_manager.send_personal_message(message, websocket)
 
-        await connection_manager.broadcast(f"{user_name} присоединился к чату", websocket)
+        await connection_manager.broadcast(
+            {"sender": None, "content": f"{user_name} присоединился(-лась) к чату"}, websocket
+        )
 
         try:
             while True:
                 data = await websocket.receive_text()
 
-                await connection_manager.send_personal_message(f"Вы: {data}", websocket)
+                await connection_manager.send_personal_message({"sender": user_name, "content": data}, websocket)
 
-                await connection_manager.broadcast(f"{user_name}: {data}", websocket)
+                await connection_manager.broadcast({"sender": user_name, "content": data}, websocket)
 
                 await self.send_message(MessageSchema(sender_id=client_id, message=data))
 
         except WebSocketDisconnect:
             connection_manager.disconnect(websocket)
 
-            await connection_manager.broadcast(f"{user_name} вышел из чата", websocket)
+            await connection_manager.broadcast(
+                {"sender": None, "content": f"{user_name} вышел(-ла) из чата"}, websocket
+            )

@@ -15,14 +15,14 @@ class ConnectionManagerService:
         self.active_connections.remove(websocket)
 
     @staticmethod
-    async def send_personal_message(message: str, websocket: WebSocket) -> None:
-        await websocket.send_text(message)
+    async def send_personal_message(message: dict[str, str], websocket: WebSocket) -> None:
+        await websocket.send_json(message)
 
-    async def broadcast(self, message: str, websocket: WebSocket) -> None:
+    async def broadcast(self, message: dict[str, str], websocket: WebSocket) -> None:
         for connection in self.active_connections:
             if connection == websocket:
                 continue
-            await connection.send_text(message)
+            await connection.send_json(message)
 
 
 connection_manager: ConnectionManagerService = ConnectionManagerService()

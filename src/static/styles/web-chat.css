@@ -41,11 +41,6 @@ body {
     color: #ffeb3b;
 }
 
-/* .current-user {
-    font-weight: bold;
-    color: #ffeb3b;
-} */
-
 .chat-messages {
     flex: 1;
     padding: 20px;

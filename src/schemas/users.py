@@ -12,3 +12,7 @@ class UserRegisterSchema(UserBaseSchema):
 
 class UserAuthSchema(UserBaseSchema):
     pass
+
+
+class UserIdSchema(BaseModel):
+    id: int

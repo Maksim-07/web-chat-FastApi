@@ -11,10 +11,10 @@ from services.user import UserService
 
 class MessageService:
     def __init__(
-            self,
-            message_repo: MessageRepository = Depends(),
-            user_repo: UserRepository = Depends(),
-            user_service: UserService = Depends(),
+        self,
+        message_repo: MessageRepository = Depends(),
+        user_repo: UserRepository = Depends(),
+        user_service: UserService = Depends(),
     ):
         self.message_repo = message_repo
         self.user_repo = user_repo

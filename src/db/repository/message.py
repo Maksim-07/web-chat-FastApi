@@ -1,6 +1,6 @@
 from typing import Sequence
 
-from sqlalchemy import select, Row
+from sqlalchemy import Row, select
 
 from db.models import User
 from db.models.message import Message
@@ -16,9 +16,7 @@ class MessageRepository(BaseDatabaseRepository[Message]):
         return result.scalars().all()
 
     async def get_all_messages(self) -> Sequence[Row[tuple[str, str]]]:
-        query = select(User.login, self.model.message).join(
-            self.model, User.id == self.model.sender_id
-        )
+        query = select(User.login, self.model.message).join(self.model, User.id == self.model.sender_id)
         result = await self._session.execute(query)
 
         return result.fetchmany()

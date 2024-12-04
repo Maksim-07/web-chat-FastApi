@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class MessageSchema(BaseModel):
@@ -7,5 +7,5 @@ class MessageSchema(BaseModel):
 
 
 class CurrentMessageSchema(BaseModel):
-    login: str = ''
+    login: str = Field(default="")
     message: str

@@ -61,8 +61,8 @@ function connectWebSocket(id) {
         try {
             const d = JSON.parse(event.data);
             const data = JSON.parse(d);
-            const sender = data["sender"];
-            const content = data["content"];
+            const sender = data["login"];
+            const content = data["message"];
             if (sender != userName) {
                 showMessage(sender, content, false);
             } else {

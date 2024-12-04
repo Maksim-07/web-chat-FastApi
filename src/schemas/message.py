@@ -7,5 +7,5 @@ class MessageSchema(BaseModel):
 
 
 class CurrentMessageSchema(BaseModel):
-    sender: str = ""
-    content: str
+    login: str = ''
+    message: str

@@ -4,7 +4,7 @@ from fastapi import Depends, WebSocket, WebSocketDisconnect
 
 from db.repository.message import MessageRepository
 from db.repository.user import UserRepository
-from schemas.message import MessageSchema
+from schemas.message import CurrentMessageSchema, MessageSchema
 from services.connection_websocket import connection_manager
 from services.user import UserService
 
@@ -20,57 +20,56 @@ class MessageService:
         self.user_repo = user_repo
         self.user_service = user_service
 
-    async def send_message(self, message: MessageSchema) -> None:
+    async def add_message(self, message: MessageSchema) -> None:
         await self.message_repo.add(sender_id=message.sender_id, message=message.message)
 
-    async def read_message(self, login) -> Sequence[str]:
+    async def get_messages(self, login) -> Sequence[str]:
         user_id = await self.user_repo.get_id_by_login(login=login)
 
-        return await self.message_repo.get_message_by_sender_id(user_id)
+        return await self.message_repo.get_messages_by_sender_id(user_id)
 
-    async def show_all_messages(self) -> list[dict[str, str]]:
+    async def get_list_messages(self) -> list[CurrentMessageSchema]:
         all_messages = await self.message_repo.get_all()
 
         list_messages = []
         for message in all_messages:
-            dict_message: dict[str, str] = {}
-
             user_id = message.sender_id
             login = await self.user_service.get_login_by_id(user_id)
 
-            dict_message["sender"] = login
-            dict_message["content"] = message.message
+            current_message = CurrentMessageSchema(sender=login, content=message.message)
 
-            list_messages.append(dict_message)
+            list_messages.append(current_message)
 
         return list_messages
 
-    async def working_with_websocket(self, websocket: WebSocket, client_id: int):
+    async def process_websocket(self, websocket: WebSocket, client_id: int) -> None:
         await connection_manager.connect(websocket)
 
         user_name = await self.user_repo.get_login_by_id(user_id=client_id)
 
-        all_messages = await self.show_all_messages()
+        all_messages = await self.get_list_messages()
         for message in all_messages:
-            await connection_manager.send_personal_message(message, websocket)
+            m = message.model_dump_json()
+            await connection_manager.send_personal_message(m, websocket)
 
-        await connection_manager.broadcast(
-            {"sender": None, "content": f"{user_name} присоединился(-лась) к чату"}, websocket
-        )
+        connect_message = CurrentMessageSchema(content=f"{user_name} присоединился(-лась) к чату").model_dump_json()
+        disconnect_message = CurrentMessageSchema(content=f"{user_name} вышел(-ла) из чата").model_dump_json()
+
+        await connection_manager.broadcast(connect_message, websocket)
 
         try:
             while True:
                 data = await websocket.receive_text()
 
-                await connection_manager.send_personal_message({"sender": user_name, "content": data}, websocket)
+                message = CurrentMessageSchema(sender=user_name, content=data)
 
-                await connection_manager.broadcast({"sender": user_name, "content": data}, websocket)
+                await connection_manager.send_personal_message(message.model_dump_json(), websocket)
 
-                await self.send_message(MessageSchema(sender_id=client_id, message=data))
+                await connection_manager.broadcast(message.model_dump_json(), websocket)
+
+                await self.add_message(MessageSchema(sender_id=client_id, message=data))
 
         except WebSocketDisconnect:
             connection_manager.disconnect(websocket)
 
-            await connection_manager.broadcast(
-                {"sender": None, "content": f"{user_name} вышел(-ла) из чата"}, websocket
-            )
+            await connection_manager.broadcast(disconnect_message, websocket)

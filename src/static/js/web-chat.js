@@ -14,7 +14,7 @@ async function getIdByLogin(url) {
 }
 
 async function main(login) {
-    const url = `http://127.0.0.1:8000/user/id/${login}`;
+    const url = `http://127.0.0.1:8000/api/users/${login}`;
     const id = await getIdByLogin(url);
     connectWebSocket(id["id"]);
 }
@@ -46,7 +46,7 @@ function showMessage(sender, content, isSent) {
 }
 
 function connectWebSocket(id) {
-    const socket = new WebSocket('ws://127.0.0.1:8000/ws/' + id);
+    const socket = new WebSocket('ws://127.0.0.1:8000/api/ws/' + id);
     console.log('ws://127.0.0.1:8000/ws/' + id)
 
     socket.onopen = function() {
@@ -59,7 +59,8 @@ function connectWebSocket(id) {
 
     socket.onmessage = function(event) {
         try {
-            const data = JSON.parse(event.data);
+            const d = JSON.parse(event.data);
+            const data = JSON.parse(d);
             const sender = data["sender"];
             const content = data["content"];
             if (sender != userName) {

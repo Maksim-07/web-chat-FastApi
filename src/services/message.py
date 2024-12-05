@@ -16,12 +16,12 @@ class MessageService:
         message_repo: MessageRepository = Depends(),
         user_repo: UserRepository = Depends(),
         user_service: UserService = Depends(),
-        connection_websocket: ConnectionManagerService = Depends(connection_manager),
+        connection_manager_service: ConnectionManagerService = Depends(connection_manager),
     ):
         self.message_repo = message_repo
         self.user_repo = user_repo
         self.user_service = user_service
-        self.connection_websocket = connection_websocket
+        self.connection_manager_service = connection_manager_service
 
     async def add_message(self, message: MessageSchema) -> None:
         await self.message_repo.add(sender_id=message.sender_id, message=message.message)
@@ -35,7 +35,7 @@ class MessageService:
         return await self.message_repo.get_messages_by_sender_id(user_id)
 
     async def process_websocket(self, websocket: WebSocket, client_id: int) -> None:
-        await self.connection_websocket.connect(websocket)
+        await self.connection_manager_service.connect(websocket)
 
         user_name = await self.user_repo.get_login_by_id(user_id=client_id)
 
@@ -45,9 +45,9 @@ class MessageService:
         all_messages = await self.message_repo.get_all_messages()
         for m in all_messages:
             message = CurrentMessageSchema(login=m[0], message=m[1])
-            await self.connection_websocket.send_personal_message(message, websocket)
+            await self.connection_manager_service.send_personal_message(message, websocket)
 
-        await self.connection_websocket.broadcast(
+        await self.connection_manager_service.broadcast(
             CurrentMessageSchema(message=f"{user_name} присоединился(-лась) к чату"), websocket
         )
 
@@ -57,13 +57,15 @@ class MessageService:
 
                 message = CurrentMessageSchema(login=user_name, message=data)
 
-                await self.connection_websocket.send_personal_message(message, websocket)
+                await self.connection_manager_service.send_personal_message(message, websocket)
 
-                await self.connection_websocket.broadcast(message, websocket)
+                await self.connection_manager_service.broadcast(message, websocket)
 
                 await self.add_message(MessageSchema(sender_id=client_id, message=data))
 
         except WebSocketDisconnect:
-            self.connection_websocket.disconnect(websocket)
+            self.connection_manager_service.disconnect(websocket)
 
-            await self.connection_websocket.broadcast(CurrentMessageSchema(message=f"{user_name} вышел(-ла) из чата"), websocket)
+            await self.connection_manager_service.broadcast(
+                CurrentMessageSchema(message=f"{user_name} вышел(-ла) из чата"), websocket
+            )

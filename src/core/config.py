@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str
     POSTGRES_DB: str
 
+    ALGORITHM: str
+    SECRET_KEY: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
     @functools.cached_property
     def cors_allow_origins(self) -> list[str]:
         return self.CORS_ALLOW_ORIGIN_LIST.split("&")

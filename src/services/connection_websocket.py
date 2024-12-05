@@ -1,22 +1,15 @@
 import functools
-from typing import List, Type
+from typing import List
 
 from fastapi import WebSocket
 
+from schemas.message import CurrentMessageSchema
+
 
 class ConnectionManagerService:
-    __instance = None
-
-    def __new__(cls):
-        if cls.__instance is None:
-            cls.__instance = super().__new__(cls)
-            print(type(cls.__instance))
-        return cls.__instance
-
-    def __init__(self):
+    def __init__(self) -> None:
         self.active_connections: List[WebSocket] = []
 
-    @functools.lru_cache()
     async def connect(self, websocket: WebSocket) -> None:
         await websocket.accept()
         self.active_connections.append(websocket)
@@ -25,14 +18,16 @@ class ConnectionManagerService:
         self.active_connections.remove(websocket)
 
     @staticmethod
-    async def send_personal_message(message: str, websocket: WebSocket) -> None:
-        await websocket.send_json(message)
+    async def send_personal_message(message: CurrentMessageSchema, websocket: WebSocket) -> None:
+        await websocket.send_json(message.model_dump_json())
 
-    async def broadcast(self, message: str, websocket: WebSocket) -> None:
+    async def broadcast(self, message: CurrentMessageSchema, websocket: WebSocket) -> None:
         for connection in self.active_connections:
             if connection == websocket:
                 continue
-            await connection.send_json(message)
+            await connection.send_json(message.model_dump_json())
 
 
-connection_manager: ConnectionManagerService = ConnectionManagerService()
+@functools.lru_cache()
+def connection_manager() -> ConnectionManagerService:
+    return ConnectionManagerService()

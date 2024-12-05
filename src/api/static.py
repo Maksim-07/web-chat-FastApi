@@ -15,3 +15,8 @@ async def redirect_to_auth():
 @router.get("/auth", status_code=status.HTTP_200_OK)
 async def get_window_auth(request: Request):
     return templates.TemplateResponse("auth.html", {"request": request})
+
+
+@router.get("/chat", status_code=status.HTTP_200_OK)
+async def get_window_chat(request: Request):
+    return templates.TemplateResponse("web-chat.html", {"request": request})

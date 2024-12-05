@@ -1,7 +1,7 @@
 from fastapi import Depends
 
 from db.repository.user import UserRepository
-from schemas.users import UserIdSchema
+from schemas.users import UserIdSchema, UserLoginSchema
 
 
 class UserService:
@@ -13,7 +13,7 @@ class UserService:
 
         return UserIdSchema(id=user_id)
 
-    async def get_login_by_id(self, id_user: int) -> str:
+    async def get_user_login(self, id_user: int) -> UserLoginSchema:
         login = await self.user_repo.get_login_by_id(user_id=id_user)
 
-        return login
+        return UserLoginSchema(login=login)

@@ -16,3 +16,7 @@ class UserAuthSchema(UserBaseSchema):
 
 class UserIdSchema(BaseModel):
     id: int
+
+
+class UserLoginSchema(BaseModel):
+    login: str

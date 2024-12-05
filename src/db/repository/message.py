@@ -13,6 +13,7 @@ class MessageRepository(BaseDatabaseRepository[Message]):
     async def get_messages_by_sender_id(self, sender_id: int) -> Sequence[str]:
         query = select(self.model.message).filter_by(sender_id=sender_id)
         result = await self._session.execute(query)
+
         return result.scalars().all()
 
     async def get_all_messages(self) -> Sequence[Row[tuple[str, str]]]:

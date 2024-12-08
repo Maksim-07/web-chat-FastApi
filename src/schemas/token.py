@@ -6,5 +6,6 @@ class TokenSchema(BaseModel):
     token_type: str
 
 
-class TokenData(BaseModel):
+class TokenDataSchema(BaseModel):
+    id: int
     login: str

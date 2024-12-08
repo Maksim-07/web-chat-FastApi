@@ -1,6 +1,8 @@
-const userName = localStorage.getItem('userName');
+const token = localStorage.getItem('token');
 
-async function getIdByLogin(url) {
+var login;
+
+async function getUser(url) {
     try {
         const response = await fetch(url);
         if (!response.ok) {
@@ -13,17 +15,17 @@ async function getIdByLogin(url) {
     }
 }
 
-async function main(login) {
-    const url = `http://127.0.0.1:8000/api/users/${login}`;
-    const id = await getIdByLogin(url);
-    connectWebSocket(id["id"]);
-}
+async function main(token) {
+    const url = `http://127.0.0.1:8000/api/users/me?token=${token}`;
+    const data = await getUser(url);
 
-document.addEventListener("DOMContentLoaded", () => {
-    if (userName) {
-        document.getElementById('username').innerText = userName;
-    }
-});
+    const user_id = data.id;
+    globalThis.login = data.login;
+
+    document.getElementById('username').innerText = login;
+
+    connectWebSocket(user_id);
+}
 
 function showMessage(sender, content, isSent) {
     const container = document.getElementById('messageContainer');
@@ -63,7 +65,7 @@ function connectWebSocket(id) {
             const data = JSON.parse(d);
             const sender = data["login"];
             const content = data["message"];
-            if (sender != userName) {
+            if (sender != login) {
                 showMessage(sender, content, false);
             } else {
                 showMessage(sender, content, true);
@@ -95,6 +97,6 @@ function connectWebSocket(id) {
     });
 }
 
-main(userName).catch(error => {
+main(token).catch(error => {
     console.error('Ошибка в main:', error);
 });

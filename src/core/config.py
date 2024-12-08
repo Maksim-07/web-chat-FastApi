@@ -28,7 +28,7 @@ class Settings(BaseSettings):
 
     ALGORITHM: str
     SECRET_KEY: str
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
 
     @functools.cached_property
     def cors_allow_origins(self) -> list[str]:

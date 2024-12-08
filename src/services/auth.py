@@ -22,12 +22,9 @@ class AuthService:
         self.user_repo = user_repo
 
     @staticmethod
-    def create_access_token(data: dict, expires_delta: timedelta | None = None):
+    def create_access_token(data: dict) -> str:
         to_encode = data.copy()
-        if expires_delta:
-            expire = datetime.now(timezone.utc) + expires_delta
-        else:
-            expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=settings().ACCESS_TOKEN_EXPIRE_MINUTES)
         to_encode.update({"exp": expire})
         encoded_jwt = jwt.encode(to_encode, key=settings().SECRET_KEY, algorithm=settings().ALGORITHM)
 
@@ -40,10 +37,7 @@ class AuthService:
             raise user_not_found_exception
 
         if self.__verify_password(password=user.password, hash_password=current_user.password):
-            access_token_expires = timedelta(minutes=settings().ACCESS_TOKEN_EXPIRE_MINUTES)
-            access_token = self.create_access_token(
-                data={"sub": current_user.login}, expires_delta=access_token_expires
-            )
+            access_token = self.create_access_token(data={"id": current_user.id, "login": current_user.login})
 
             return TokenSchema(access_token=access_token, token_type="bearer")
 

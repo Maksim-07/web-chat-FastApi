@@ -1,12 +1,11 @@
 import jwt
 from fastapi import Depends
-from jwt.exceptions import InvalidTokenError
+from jwt import InvalidTokenError
 
 from core.config import settings
 from core.exceptions import credentials_exception, invalid_token_exception
 from db.repository.user import UserRepository
-from schemas.token import TokenData
-from schemas.users import UserIdSchema, UserLoginSchema
+from schemas.token import TokenDataSchema
 
 
 class UserService:
@@ -14,24 +13,15 @@ class UserService:
         self.user_repo = user_repo
 
     @staticmethod
-    async def get_current_user(token) -> TokenData:
+    async def get_current_user(token: str) -> TokenDataSchema:
         try:
             payload = jwt.decode(token, settings().SECRET_KEY, algorithms=[settings().ALGORITHM])
-            login: str = payload.get("sub")
-            if login is None:
+            user_id: str = payload.get("id")
+            login: str = payload.get("login")
+            if user_id is None:
                 raise credentials_exception
-            token_data = TokenData(login=login)
+            token_data = TokenDataSchema(id=user_id, login=login)
         except InvalidTokenError:
             raise invalid_token_exception
 
         return token_data
-
-    async def get_user_id(self, login: str) -> UserIdSchema:
-        user_id = await self.user_repo.get_id_by_login(login=login)
-
-        return UserIdSchema(id=user_id)
-
-    async def get_user_login(self, id_user: int) -> UserLoginSchema:
-        login = await self.user_repo.get_login_by_id(user_id=id_user)
-
-        return UserLoginSchema(login=login)

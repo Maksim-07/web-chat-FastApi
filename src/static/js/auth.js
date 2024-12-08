@@ -17,7 +17,6 @@ loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const username = loginForm.querySelector('input[type="text"]').value;
-    localStorage.setItem('userName', username);
     const password = loginForm.querySelector('input[type="password"]').value;
 
     try {
@@ -30,6 +29,7 @@ loginForm.addEventListener('submit', async (e) => {
         })
         if (response.ok) {
             const data = await response.json();
+            localStorage.setItem("token", data.access_token);
             window.location.href = 'http://127.0.0.1:8000/chat';
         } else {
             alert('Ошибка входа. Проверьте логин и пароль.');

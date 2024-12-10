@@ -30,11 +30,11 @@ class AuthService:
         token = request.headers.get("Authorization")
         try:
             payload = jwt.decode(token, settings().SECRET_KEY, algorithms=[settings().ALGORITHM])
-            user_id: str = payload.get("sub")
-            login: str = payload.get("name")
+            user_id: int = payload.get("user_id")
+            login: str = payload.get("sub")
             if user_id is None:
                 raise credentials_exception
-            token_data = CurrentUserSchema(id=int(user_id), login=login)
+            token_data = CurrentUserSchema(id=user_id, login=login)
         except InvalidTokenError:
             raise invalid_token_exception
 
@@ -73,7 +73,7 @@ class AuthService:
     @staticmethod
     def __create_access_token(data: CurrentUserSchema) -> str:
         expire = datetime.now(timezone.utc) + timedelta(minutes=settings().ACCESS_TOKEN_EXPIRE_MINUTES)
-        to_encode = TokenDataSchema(sub=str(data.id), name=data.login, exp=expire)
+        to_encode = TokenDataSchema(user_id=data.id, sub=data.login, exp=expire)
         encoded_jwt = jwt.encode(to_encode.model_dump(), key=settings().SECRET_KEY, algorithm=settings().ALGORITHM)
 
         return encoded_jwt

@@ -6,12 +6,9 @@ class UserBaseSchema(BaseModel):
     password: str
 
 
-class UserRegisterSchema(UserBaseSchema):
-    pass
-
-
-class UserAuthSchema(UserBaseSchema):
-    pass
+class UserRegisterFormSchema(BaseModel):
+    username: str
+    password: str
 
 
 class CurrentUserSchema(BaseModel):

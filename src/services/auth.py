@@ -15,7 +15,7 @@ from core.exceptions import (
     user_not_found_exception,
 )
 from db.repository.user import UserRepository
-from schemas.token import TokenSchema
+from schemas.token import TokenDataSchema, TokenSchema
 from schemas.users import CurrentUserSchema, UserAuthSchema, UserRegisterSchema
 
 
@@ -27,14 +27,14 @@ class AuthService:
 
     @staticmethod
     async def get_current_user(request: Request) -> CurrentUserSchema:
-        token = request.headers.get('Authorization')
+        token = request.headers.get("Authorization")
         try:
             payload = jwt.decode(token, settings().SECRET_KEY, algorithms=[settings().ALGORITHM])
-            user_id: str = payload.get("id")
-            login: str = payload.get("login")
+            user_id: str = payload.get("sub")
+            login: str = payload.get("name")
             if user_id is None:
                 raise credentials_exception
-            token_data = CurrentUserSchema(id=user_id, login=login)
+            token_data = CurrentUserSchema(id=int(user_id), login=login)
         except InvalidTokenError:
             raise invalid_token_exception
 
@@ -47,7 +47,9 @@ class AuthService:
             raise user_not_found_exception
 
         if self.__verify_password(password=user.password, hash_password=current_user.password):
-            access_token = self.__create_access_token(data={"id": current_user.id, "login": current_user.login})
+            access_token = self.__create_access_token(
+                data=CurrentUserSchema(id=current_user.id, login=current_user.login)
+            )
 
             return TokenSchema(access_token=access_token, token_type="bearer")
 
@@ -69,10 +71,9 @@ class AuthService:
         return self.__ctx.verify(password, hash_password)
 
     @staticmethod
-    def __create_access_token(data: dict) -> str:
-        to_encode = data.copy()
+    def __create_access_token(data: CurrentUserSchema) -> str:
         expire = datetime.now(timezone.utc) + timedelta(minutes=settings().ACCESS_TOKEN_EXPIRE_MINUTES)
-        to_encode.update({"exp": expire})
-        encoded_jwt = jwt.encode(to_encode, key=settings().SECRET_KEY, algorithm=settings().ALGORITHM)
+        to_encode = TokenDataSchema(sub=str(data.id), name=data.login, exp=expire)
+        encoded_jwt = jwt.encode(to_encode.model_dump(), key=settings().SECRET_KEY, algorithm=settings().ALGORITHM)
 
         return encoded_jwt

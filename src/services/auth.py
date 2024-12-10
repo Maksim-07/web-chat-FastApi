@@ -16,7 +16,7 @@ from core.exceptions import (
 )
 from db.repository.user import UserRepository
 from schemas.token import TokenDataSchema, TokenSchema
-from schemas.users import CurrentUserSchema, UserAuthSchema, UserRegisterSchema
+from schemas.users import CurrentUserSchema
 
 
 class AuthService:
@@ -55,14 +55,14 @@ class AuthService:
 
         raise incorrect_password_exception
 
-    async def register(self, user: UserRegisterSchema) -> None:
-        current_user = await self.user_repo.get_by(login=user.login)
+    async def register(self, login: str, password: str) -> None:
+        current_user = await self.user_repo.get_by(login=login)
 
         if current_user:
             raise user_already_exists_exception
 
-        hashed_password = self.__get_password_hash(password=user.password)
-        await self.user_repo.add(login=user.login, password=hashed_password)
+        hashed_password = self.__get_password_hash(password=password)
+        await self.user_repo.add(login=login, password=hashed_password)
 
     def __get_password_hash(self, password: str) -> str:
         return self.__ctx.hash(password)

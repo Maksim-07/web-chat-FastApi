@@ -48,16 +48,22 @@ loginForm.addEventListener('submit', async (e) => {
 
 registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+
     const username = registerForm.querySelector('input[type="text"]').value;
     const password = registerForm.querySelector('input[type="password"]').value;
+
+    const formDataRegister = new URLSearchParams({
+        username: username,
+        password: password,
+    });
 
     try {
         const response = await fetch('http://127.0.0.1:8000/api/auth/register', {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json',
+              'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: JSON.stringify({ login: username, password: password }),
+            body: formDataRegister,
         });
         if (response.ok) {
             alert('Регистрация успешна. Теперь вы можете войти.');

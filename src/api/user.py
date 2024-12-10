@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 
-from schemas.token import TokenDataSchema
-from services.user import UserService
+from schemas.users import CurrentUserSchema
+from services.auth import AuthService
 
 router = APIRouter(prefix="/users", tags=["User"])
 
 
-@router.get("/me", response_model=TokenDataSchema)
-async def get_current_user(token: str, user_service: UserService = Depends()) -> TokenDataSchema:
-    return await user_service.get_current_user(token=token)
+@router.get("/me", response_model=CurrentUserSchema)
+async def get_current_user(request: Request, auth_service: AuthService = Depends()) -> CurrentUserSchema:
+    return await auth_service.get_current_user(request=request)

@@ -4,7 +4,13 @@ var login;
 
 async function getUser(url) {
     try {
-        const response = await fetch(url);
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token,
+            },
+        })
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -16,7 +22,7 @@ async function getUser(url) {
 }
 
 async function main(token) {
-    const url = `http://127.0.0.1:8000/api/users/me?token=${token}`;
+    const url = `http://127.0.0.1:8000/api/users/me`;
     const data = await getUser(url);
 
     const user_id = data.id;

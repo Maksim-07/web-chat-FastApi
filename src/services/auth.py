@@ -1,18 +1,22 @@
 from datetime import datetime, timedelta, timezone
 
 import jwt
-from fastapi import Depends
+from fastapi import Depends, Request
+from fastapi.security import OAuth2PasswordRequestForm
+from jwt import InvalidTokenError
 from passlib.context import CryptContext
 
 from core.config import settings
 from core.exceptions import (
+    credentials_exception,
     incorrect_password_exception,
+    invalid_token_exception,
     user_already_exists_exception,
     user_not_found_exception,
 )
 from db.repository.user import UserRepository
 from schemas.token import TokenSchema
-from schemas.users import UserAuthSchema, UserRegisterSchema
+from schemas.users import CurrentUserSchema, UserAuthSchema, UserRegisterSchema
 
 
 class AuthService:
@@ -22,22 +26,28 @@ class AuthService:
         self.user_repo = user_repo
 
     @staticmethod
-    def create_access_token(data: dict) -> str:
-        to_encode = data.copy()
-        expire = datetime.now(timezone.utc) + timedelta(minutes=settings().ACCESS_TOKEN_EXPIRE_MINUTES)
-        to_encode.update({"exp": expire})
-        encoded_jwt = jwt.encode(to_encode, key=settings().SECRET_KEY, algorithm=settings().ALGORITHM)
+    async def get_current_user(request: Request) -> CurrentUserSchema:
+        token = request.headers.get('Authorization')
+        try:
+            payload = jwt.decode(token, settings().SECRET_KEY, algorithms=[settings().ALGORITHM])
+            user_id: str = payload.get("id")
+            login: str = payload.get("login")
+            if user_id is None:
+                raise credentials_exception
+            token_data = CurrentUserSchema(id=user_id, login=login)
+        except InvalidTokenError:
+            raise invalid_token_exception
 
-        return encoded_jwt
+        return token_data
 
-    async def login(self, user: UserAuthSchema) -> TokenSchema:
-        current_user = await self.user_repo.get_by(login=user.login)
+    async def login(self, user: OAuth2PasswordRequestForm) -> TokenSchema:
+        current_user = await self.user_repo.get_by(login=user.username)
 
         if not current_user:
             raise user_not_found_exception
 
         if self.__verify_password(password=user.password, hash_password=current_user.password):
-            access_token = self.create_access_token(data={"id": current_user.id, "login": current_user.login})
+            access_token = self.__create_access_token(data={"id": current_user.id, "login": current_user.login})
 
             return TokenSchema(access_token=access_token, token_type="bearer")
 
@@ -57,3 +67,12 @@ class AuthService:
 
     def __verify_password(self, password: str, hash_password: str) -> bool:
         return self.__ctx.verify(password, hash_password)
+
+    @staticmethod
+    def __create_access_token(data: dict) -> str:
+        to_encode = data.copy()
+        expire = datetime.now(timezone.utc) + timedelta(minutes=settings().ACCESS_TOKEN_EXPIRE_MINUTES)
+        to_encode.update({"exp": expire})
+        encoded_jwt = jwt.encode(to_encode, key=settings().SECRET_KEY, algorithm=settings().ALGORITHM)
+
+        return encoded_jwt

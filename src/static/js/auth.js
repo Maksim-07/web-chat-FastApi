@@ -19,13 +19,19 @@ loginForm.addEventListener('submit', async (e) => {
     const username = loginForm.querySelector('input[type="text"]').value;
     const password = loginForm.querySelector('input[type="password"]').value;
 
+    const formData = new URLSearchParams({
+        grant_type: 'password',
+        username: username,
+        password: password,
+    });
+
     try {
         const response = await fetch('http://127.0.0.1:8000/api/auth/login', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: JSON.stringify({ login: username, password: password }),
+            body: formData,
         })
         if (response.ok) {
             const data = await response.json();

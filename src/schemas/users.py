@@ -12,3 +12,8 @@ class UserRegisterSchema(UserBaseSchema):
 
 class UserAuthSchema(UserBaseSchema):
     pass
+
+
+class CurrentUserSchema(BaseModel):
+    id: int
+    login: str

@@ -12,6 +12,7 @@ async function getUser(url) {
             },
         })
         if (!response.ok) {
+            window.location.href = "http://127.0.0.1:8000/auth";
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
@@ -55,6 +56,7 @@ function showMessage(sender, content, isSent) {
 
 function connectWebSocket(id) {
     const socket = new WebSocket('ws://127.0.0.1:8000/api/ws/' + id);
+    console.log(socket);
     console.log('ws://127.0.0.1:8000/ws/' + id)
 
     socket.onopen = function() {

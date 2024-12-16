@@ -1,16 +1,13 @@
 from datetime import datetime, timedelta, timezone
 
 import jwt
-from fastapi import Depends, Request
+from fastapi import Depends
 from fastapi.security import OAuth2PasswordRequestForm
-from jwt import InvalidTokenError
 from passlib.context import CryptContext
 
 from core.config import settings
 from core.exceptions import (
-    credentials_exception,
     incorrect_password_exception,
-    invalid_token_exception,
     user_already_exists_exception,
     user_not_found_exception,
 )

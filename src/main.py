@@ -9,8 +9,9 @@ from core.config import settings
 
 app = FastAPI(
     title="web-chat",
-    openapi_url="/api/openapi.json",
-    docs_url="/api/swagger",
+    openapi_url=None,
+    docs_url=None,
+    redoc_url=None,
 )
 app.mount("/static", StaticFiles(directory="static"), name="static")
 

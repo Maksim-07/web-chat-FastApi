@@ -19,8 +19,10 @@ class UserService:
             payload = jwt.decode(token, settings().SECRET_KEY, algorithms=[settings().ALGORITHM])
             user_id: int = payload.get("user_id")
             login: str = payload.get("sub")
+
             if user_id is None:
                 raise credentials_exception
+
             user_schema = CurrentUserSchema(id=user_id, login=login)
         except InvalidTokenError:
             raise invalid_token_exception

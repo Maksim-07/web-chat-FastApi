@@ -1,27 +1,30 @@
 import jwt
-from fastapi import Query
+from fastapi import Depends, Request
+from jwt import InvalidTokenError
 
 from core.config import settings
-from core.exceptions import invalid_token_exception, token_not_found_exception, credentials_exception
-from schemas.users import CurrentUserSchema
+from core.exceptions import (
+    credentials_exception,
+    invalid_token_exception,
+    user_not_found_exception,
+)
+from db.repository.user import UserRepository
 
 
-def get_and_verify_token_from_query(token: str = Query(None, alias="token")) -> CurrentUserSchema:
-    if not token:
-        raise token_not_found_exception
-
+async def get_and_verify_token(request: Request, user_repo: UserRepository = Depends()) -> str:
+    token = request.headers.get("Authorization")
     try:
-        payload = jwt.decode(token, settings().SECRET_KEY, settings().ALGORITHM)
+        payload = jwt.decode(token, settings().SECRET_KEY, algorithms=[settings().ALGORITHM])
         user_id: int = payload.get("user_id")
-        login: str = payload.get("sub")
 
         if user_id is None:
             raise credentials_exception
 
-        user_schema = CurrentUserSchema(id=user_id, login=login)
+        user = await user_repo.get_by(id=user_id)
+        if user is None:
+            raise user_not_found_exception
 
-    except jwt.InvalidTokenError:
+    except InvalidTokenError:
         raise invalid_token_exception
 
-    return user_schema
-
+    return token

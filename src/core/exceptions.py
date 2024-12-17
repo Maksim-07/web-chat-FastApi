@@ -15,6 +15,11 @@ login_not_found_exception = HTTPException(
     detail="User login not found",
 )
 
+token_not_found_exception = HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND,
+    detail="Token not found",
+)
+
 user_already_exists_exception = HTTPException(
     status_code=status.HTTP_409_CONFLICT,
     detail="The user already exists",

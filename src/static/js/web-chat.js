@@ -55,9 +55,7 @@ function showMessage(sender, content, isSent) {
 }
 
 function connectWebSocket(id) {
-    const socket = new WebSocket('ws://127.0.0.1:8000/api/ws/' + id);
-    console.log(socket);
-    console.log('ws://127.0.0.1:8000/ws/' + id)
+    const socket = new WebSocket(`ws://127.0.0.1:8000/api/ws/${id}?token=${token}`);
 
     socket.onopen = function() {
         alert("Соединение установлено");
@@ -84,6 +82,9 @@ function connectWebSocket(id) {
     };
 
     socket.onclose = function() {
+        if (event.code == 1006) {
+            window.location.href = "/auth";
+        }
         alert("Соединение закрыто");
     };
 

@@ -38,9 +38,8 @@ async def get_and_verify_token_from_query(
 
 
 class ConnectionManagerService:
-    def __init__(self, user_repo: UserRepository = Depends()) -> None:
+    def __init__(self) -> None:
         self.active_connections: List[WebSocket] = []
-        self.user_repo = user_repo
 
     async def connect(self, websocket: WebSocket) -> None:
         await websocket.accept()

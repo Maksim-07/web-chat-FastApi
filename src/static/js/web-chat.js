@@ -8,7 +8,7 @@ async function getUser(url) {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': token,
+                'Authorization': `Bearer ${token}`,
             },
         })
         if (!response.ok) {

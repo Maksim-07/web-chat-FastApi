@@ -1,8 +1,19 @@
-# FastAPI + SQLAlchemy MVC template 
+# Веб чат на FastApi и SQLAlchemy
 
+## Инструкция для развертывания приложения
 
-## Создание окружения    
+### 1. Клонирование репозитория
+
+``` Bash
+git clone https://github.com/Maksim-07/web-chat-FastApi.git
+
+cd web-chat-FastApi
+```
+
+### 2. Создание окружения
+
 Установка poetry и необходимых пакетов:
+
 ``` Bash
 pip install poetry
 
@@ -10,14 +21,24 @@ cd .\src\
 poetry install
 ```
 
-Установить postgreSQL и pdAdmin, создать БД с параметрами из ```src/core/config.py```   
+### 3. Настройка переменных окружения Python
 
-Применение миграций:
-``` Bash
-poetry run alembic upgrade head
+Создать файл ```.env``` в корневой папке ```src``` и заполнить следующим содержимым:
+
+```
+POSTGRES_HOST="web-chat-db"
+POSTGRES_PORT=5532
+POSTGRES_USER="web-chat-db"
+POSTGRES_PASSWORD="web-chat-db"
+POSTGRES_DB="web-chat-db"
+
+ALGORITHM="your-algorithm"
+SECRET_KEY="your-secret-key-for-jwt-token"
 ```
 
-Локальный запуск сервиса:
+### 4. Запуск приложения с помощью Docker Compose
+
 ``` Bash
-poetry run py main.py
+docker-compose up -d
 ```
+

@@ -1,22 +1,20 @@
-from pydantic import BaseModel
+from datetime import datetime
+
+from pydantic import BaseModel, Field
 
 
 class UserBaseSchema(BaseModel):
+    id: int
     login: str
+    created_at: datetime
+    updated_at: datetime | None = Field(default=None)
+
+
+class UserRegisterFormSchema(BaseModel):
+    username: str
     password: str
 
 
-class UserRegisterSchema(UserBaseSchema):
-    pass
-
-
-class UserAuthSchema(UserBaseSchema):
-    pass
-
-
-class UserIdSchema(BaseModel):
+class CurrentUserSchema(BaseModel):
     id: int
-
-
-class UserLoginSchema(BaseModel):
     login: str

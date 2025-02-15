@@ -1,0 +1,23 @@
+<html>
+<head>
+    <base href="/" />
+    <meta charset="UTF-8">
+    <title>Web Chat</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='styles/web-chat.css') }}">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <span></span>
+            <h2>Web Chat</h2>
+            <span id="username" class="username current-user"></span>
+        </div>
+        <div class="chat-messages" id="messageContainer"></div>
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Наберите сообщение...">
+            <button id="submitButton">Отправить</button>
+        </div>
+    </div>
+    <script src="{{ url_for('static', path='js/web-chat.js') }}"></script>
+</body>
+</html>

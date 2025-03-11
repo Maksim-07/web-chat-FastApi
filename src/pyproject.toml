@@ -1,9 +1,10 @@
 [tool.poetry]
-name = "template"
+name = "web-chat"
 version = "0.1.0"
 description = ""
-authors = [""]
-readme = "README.md"
+authors = ["Maksim-07 <kosmakovmaksim@yandex.ru>"]
+readme = ""
+package-mode = false
 
 
 [tool.poetry.dependencies]
